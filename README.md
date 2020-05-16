@@ -1,3 +1,5 @@
+NOT my code
+
 # Hierarchical Actor-Critc (HAC)
 This repository contains the code to implement the *Hierarchical Actor-Critic (HAC)* algorithm.  HAC helps agents learn tasks more quickly by enabling them to break problems down into short sequences of actions.  For more information on the algorithm, please see our ICLR 2019 [paper](https://openreview.net/pdf?id=ryzECoAcY7) and [blog post](http://bigai.cs.brown.edu/2019/09/03/hac.html).
 
