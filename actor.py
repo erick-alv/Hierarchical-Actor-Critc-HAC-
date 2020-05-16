@@ -30,12 +30,13 @@ class Actor():
         if layer_number == 0:
             self.action_space_size = env.action_dim
         else:
-            self.action_space_size = env.subgoal_dim
+            self.action_space_size = env.subgoal_dim #sine the action is giving next subgoal
+                                                     # the it tells which must be the next subgoal
 
         self.actor_name = 'actor_' + str(layer_number) 
 
         # Dimensions of goal placeholder will differ depending on layer level
-        if layer_number == FLAGS.layers - 1:
+        if layer_number == FLAGS.agents - 1:
             self.goal_dim = env.end_goal_dim
         else:
             self.goal_dim = env.subgoal_dim
@@ -59,7 +60,7 @@ class Actor():
         # self.num_weights = len(self.weights)
         
         # Create target actor network
-        self.target = self.create_nn(self.features_ph, name = self.actor_name + '_target')
+        self.target = self.create_nn(self.features_ph, name=self.actor_name + '_target')
         self.target_weights = [v for v in tf.trainable_variables() if self.actor_name in v.op.name][len(self.weights):]
 
         self.update_target_weights = \

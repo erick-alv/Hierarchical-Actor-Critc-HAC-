@@ -6,6 +6,7 @@ import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 import os
 import pickle as cpickle
+import copy
 
 # Below class instantiates an agent
 class Agent():
@@ -18,7 +19,7 @@ class Agent():
         self.subgoal_test_perc = agent_params["subgoal_test_perc"]
 
         # Create agent with number of levels specified by user       
-        self.layers = [Layer(i,FLAGS,env,self.sess,agent_params) for i in range(FLAGS.layers)]        
+        self.layers = [Layer(i,FLAGS,env,self.sess,agent_params) for i in range(FLAGS.agents)]
 
         # Below attributes will be used help save network parameters
         self.saver = None
@@ -29,7 +30,7 @@ class Agent():
         self.initialize_networks()   
         
         # goal_array will store goal for each layer of agent.
-        self.goal_array = [None for i in range(FLAGS.layers)]
+        self.goal_array = [None for i in range(FLAGS.agents)]
 
         self.current_state = None
 
@@ -46,10 +47,10 @@ class Agent():
 
 
     # Determine whether or not each layer's goal was achieved.  Also, if applicable, return the highest level whose goal was achieved.
-    def check_goals(self,env):
+    def check_goals(self, env):
 
         # goal_status is vector showing status of whether a layer's goal has been achieved
-        goal_status = [False for i in range(self.FLAGS.layers)]
+        goal_status = [False for i in range(self.FLAGS.agents)]
 
         max_lay_achieved = None
 
@@ -57,12 +58,12 @@ class Agent():
         proj_subgoal = env.project_state_to_subgoal(env.sim, self.current_state)
         proj_end_goal = env.project_state_to_end_goal(env.sim, self.current_state)
 
-        for i in range(self.FLAGS.layers):
+        for i in range(self.FLAGS.agents):
 
             goal_achieved = True
             
             # If at highest layer, compare to end goal thresholds
-            if i == self.FLAGS.layers - 1:
+            if i == self.FLAGS.agents - 1:
 
                 # Check dimensions are appropriate         
                 assert len(proj_end_goal) == len(self.goal_array[i]) == len(env.end_goal_thresholds), "Projected end goal, actual end goal, and end goal thresholds should have same dimensions"
@@ -124,17 +125,19 @@ class Agent():
 
     # Update actor and critic networks for each layer
     def learn(self):
-
+        losses = []
         for i in range(len(self.layers)):   
-            self.layers[i].learn(self.num_updates)
+            d = self.layers[i].learn(self.num_updates)
+            losses.append(d)
+        return losses
 
        
     # Train agent for an episode
     def train(self,env, episode_num):
 
-        # Select final goal from final goal space, defined in "design_agent_and_env.py" 
-        self.goal_array[self.FLAGS.layers - 1] = env.get_next_goal(self.FLAGS.test)
-        print("Next End Goal: ", self.goal_array[self.FLAGS.layers - 1])
+        # Select final goal from final goal space, defined in "design_agent_and_env2.py"
+        self.goal_array[self.FLAGS.agents - 1] = env.get_next_goal(self.FLAGS.test)
+        print("Next End Goal: ", self.goal_array[self.FLAGS.agents - 1])
 
         # Select initial state from in initial state space, defined in environment.py
         self.current_state = env.reset_sim()
@@ -143,15 +146,20 @@ class Agent():
         # Reset step counter
         self.steps_taken = 0
 
+        #Reset cumulated reward
+        self.cumulated_reward = 0
+
         # Train for an episode
-        goal_status, max_lay_achieved = self.layers[self.FLAGS.layers-1].train(self,env, episode_num = episode_num)
+        goal_status, max_lay_achieved = self.layers[self.FLAGS.agents - 1].train(self, env, episode_num = episode_num)
 
         # Update actor/critic networks if not testing
+        losses = None
         if not self.FLAGS.test:
-            self.learn()
+            losses = self.learn()
 
         # Return whether end goal was achieved
-        return goal_status[self.FLAGS.layers-1]
+        return goal_status[self.FLAGS.agents - 1], losses, copy.copy(self.steps_taken), copy.copy(self.cumulated_reward)
+
 
     
     # Save performance evaluations

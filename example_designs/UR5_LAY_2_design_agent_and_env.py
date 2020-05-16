@@ -22,7 +22,7 @@ def design_agent_and_env(FLAGS):
     See Section 3 of this file for other agent hyperparameters that can be configured.
     """
 
-    FLAGS.layers = 2    # Enter number of levels in agent hierarchy
+    FLAGS.agents = 2    # Enter number of levels in agent hierarchy
 
     FLAGS.time_scale = 25    # Enter max sequence length in which each policy will specialize
 

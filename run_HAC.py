@@ -1,5 +1,5 @@
 """
-"run_HAC.py" executes the training schedule for the agent.  By default, the agent will alternate between exploration and testing phases.  The number of episodes in the exploration phase can be configured in section 3 of "design_agent_and_env.py" file.  If the user prefers to only explore or only test, the user can enter the command-line options ""--train_only" or "--test", respectively.  The full list of command-line options is available in the "options.py" file.
+"run_HAC.py" executes the training schedule for the agent.  By default, the agent will alternate between exploration and testing phases.  The number of episodes in the exploration phase can be configured in section 3 of "design_agent_and_env2.py" file.  If the user prefers to only explore or only test, the user can enter the command-line options ""--train_only" or "--test", respectively.  The full list of command-line options is available in the "options.py" file.
 """
 
 import pickle as cpickle
@@ -61,10 +61,3 @@ def run_HAC(FLAGS,env,agent):
             agent.FLAGS.test = False
 
             print("\n--- END TESTING ---\n")
-
-            
-
-    
-    
-
-     

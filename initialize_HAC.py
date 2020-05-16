@@ -8,11 +8,15 @@ from options import parse_options
 from agent import Agent
 from run_HAC import run_HAC
 
-# Determine training options specified by user.  The full list of available options can be found in "options.py" file.
-FLAGS = parse_options()
+def main():
+    # Determine training options specified by user.  The full list of available options can be found in "options.py" file.
+    FLAGS = parse_options()
 
-# Instantiate the agent and Mujoco environment.  The designer must assign values to the hyperparameters listed in the "design_agent_and_env.py" file. 
-agent, env = design_agent_and_env(FLAGS)
+    # Instantiate the agent and Mujoco environment.  The designer must assign values to the hyperparameters listed in the "design_agent_and_env2.py" file.
+    agent, env = design_agent_and_env(FLAGS)
 
-# Begin training
-run_HAC(FLAGS,env,agent)
+    # Begin training
+    run_HAC(FLAGS,env,agent)
+
+if __name__ == '__main__':
+    main()

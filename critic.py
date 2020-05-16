@@ -2,6 +2,7 @@ import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 import numpy as np
 from utils import layer
+import copy
 
 class Critic():
 
@@ -15,7 +16,7 @@ class Critic():
         self.q_limit = -FLAGS.time_scale
 
         # Dimensions of goal placeholder will differ depending on layer level
-        if layer_number == FLAGS.layers - 1:
+        if layer_number == FLAGS.agents - 1:
             self.goal_dim = env.end_goal_dim
         else:
             self.goal_dim = env.subgoal_dim
@@ -83,14 +84,14 @@ class Critic():
     def update(self, old_states, old_actions, rewards, new_states, goals, new_actions, is_terminals):
 
         # Be default, repo does not use target networks.  To use target networks, comment out "wanted_qs" line directly below and uncomment next "wanted_qs" line.  This will let the Bellman update use Q(next state, action) from target Q network instead of the regular Q network.  Make sure you also make the updates specified in the "learn" method in the "layer.py" file.  
-        wanted_qs = self.sess.run(self.infer,
+        '''wanted_qs = self.sess.run(self.infer,
                 feed_dict={
                     self.state_ph: new_states,
                     self.goal_ph: goals,
                     self.action_ph: new_actions
-                })
+                })'''
 
-        """
+
         # Uncomment to use target networks
         wanted_qs = self.sess.run(self.target,
                 feed_dict={
@@ -98,7 +99,7 @@ class Critic():
                     self.goal_ph: goals,
                     self.action_ph: new_actions
                 })
-        """
+
        
         for i in range(len(wanted_qs)):
             if is_terminals[i]:
@@ -118,6 +119,7 @@ class Critic():
                     self.action_ph: old_actions,
                     self.wanted_qs: wanted_qs 
                 })
+        return copy.copy(self.loss_val)
 
         
 
